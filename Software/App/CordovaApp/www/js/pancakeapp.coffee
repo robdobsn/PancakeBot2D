@@ -18,6 +18,16 @@ class PancakeApp
 	go: ->
 
 		# Create the pan display
-		panDisplay = new PanDisplay("#sqWrapper", {x:700,y:100,width:400,height:400})
+		@panDisplay = new PanDisplay("#sqWrapper", {x:300,y:100,width:400,height:400})
+
+		# Create the path editor
+        @sketchpad = Raphael.sketchpad("editor", { width: 400, height: 400, editing: true })
+        # @sketchpad.setCircularBounds()
+
+        # When the sketchpad changes, update the input field.
+            # sketchpad.change(function() {
+            #     $("#data").html(sketchpad.json());
+            # });
+
 		return
 

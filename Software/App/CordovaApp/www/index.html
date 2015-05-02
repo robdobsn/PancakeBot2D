@@ -16,9 +16,20 @@
                 document.write(unescape("%3Cscript src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));
             }
         </script>
+        <script type="text/javascript" src="lib/sketchpad/raphael-min.js"></script>
+        <script type="text/javascript" src="lib/sketchpad/json2.js"></script>
+        <script type="text/javascript" src="lib/sketchpad/raphael.sketchpad.js"></script>    </head>
         <script type="text/javascript" src="js/pancakeapp.js"></script>
         <script type="text/javascript" src="js/PanDisplay.js"></script>
-    </head>
     <body>
+        <div id="pancakePath"></div>
+
+        
+        <div id="data"></div>
+
+        <form action="save.php" method="post">
+            <input type="hidden" name="data" />
+            <input type="submit" value="Save" />
+        </form>
     </body>
 </html>
