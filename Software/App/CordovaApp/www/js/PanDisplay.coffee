@@ -12,6 +12,8 @@ class PanDisplay
 		@sketchpad = Raphael.sketchpad("pancakePath", { width: 400, height: 400, editing: true })
 		@sketchpad.setCircularBounds(200, 200, 170)
 		@sketchpad.pen().color("#d0d0d0")
+		@sketchpad.change(@sketchChanged)
+		# Reposition display eleemnts
 		@reposition(displayRect)
 
 		return
@@ -30,4 +32,17 @@ class PanDisplay
 		# $("#PanDisplay circle").attr("r", radius)
 		$("#pancakePath").css("left", @displayRect.x + "px") 
 		$("#pancakePath").css("top", @displayRect.y + "px")
+		return
+
+	sketchChanged: () =>
+		sss3 = ""
+		for stroke in @sketchpad.strokes()
+			sss = JSON.stringify(stroke)
+			path = stroke.path[0]
+			sss1 = JSON.stringify(path)
+			testpath = "M10 10L900 900"
+			res = Raphael.pathIntersection(stroke.path, testpath)
+			sss2 = JSON.stringify(res)
+			sss3 += sss2 + "\n"
+		$("#debug1").html(sss3)
 		return
