@@ -1,4 +1,5 @@
-Software/*/node_modules/*
+Software/**/node_modules/*
+
 node_modules/*
 
 
