@@ -5,12 +5,13 @@ moment = require('moment')
 path = require('path')
 bodyParser = require('body-parser')
 
+# Use bodyParser to parse application/json
+jsonParser = bodyParser.json()
+
 app = Express()
 app.set "port", process.env.PORT or 5294 # Arbitrarily chosen port number
 app.set "views", path.join(__dirname, "views")
 app.set "view engine", "jade"
-
-app.use(bodyParser.text())
 
 # app.get "/energy/:series?/:rollupperiod?", (req, res) ->
 #   if (req.params.series isnt undefined)
@@ -19,12 +20,16 @@ app.use(bodyParser.text())
 #     rollupperiod = req.params.rollupperiod
 #   if series? and rollupperiod?
 
-app.post "/print", (req, res) ->
-  console.log("PRINT")
+lastPath = []
+
+app.post "/print", jsonParser, (req, res) ->
   console.log(JSON.stringify(req.body))
-  console.log("PRINTPARAMS")
-  console.log(JSON.stringify(req.route))
+  lastPath = req.body
   return
+
+app.get "/path", (req, res) ->
+  res.send(JSON.stringify(lastPath))
+  console.log("Sending path")
 
 app.use("/", Express.static(path.join(__dirname, '../../App/WebApp/www')));
 app.use("/test", Express.static(path.join(__dirname, 'public')));

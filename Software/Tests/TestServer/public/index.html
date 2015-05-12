@@ -1,1 +1,25 @@
-Hello
+<html>
+    <head>
+        <title>Test Pancake Bot 2D</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    	<script type="text/javascript">
+    		$(function() {
+   				$.getJSON( "/path", function( data ) {
+				  var items = [];
+				  $.each( data, function( key, val ) {
+				    items.push( "<li id='" + key + "'>" + val + "</li>" );
+				  });
+				 
+				  $( "<ul/>", {
+				    "class": "my-new-list",
+				    html: items.join( "" )
+				  }).appendTo( "body" );
+				});
+			});
+    	</script>
+    <body>
+
+    </body>
+</html>
+
+
