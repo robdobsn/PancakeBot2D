@@ -144,6 +144,11 @@
 			return path;
 		}
 		
+		function is_touch_device() {
+			return (('ontouchstart' in window)
+				|| (navigator.MaxTouchPoints > 0)
+				|| (navigator.msMaxTouchPoints > 0));
+		}
 		self.json = function(value) {
 			if (value === undefined) {
 				for (var i = 0, n = _strokes.length; i < n; i++) {
@@ -271,9 +276,8 @@
 					$(_container).unbind("mouseup", _mouseup);
 					$(document).unbind("mouseup", _mouseup);
 
-					// iPhone Events
-					var agent = navigator.userAgent;
-					if (agent.indexOf("iPhone") > 0 || agent.indexOf("iPod") > 0) {
+					// touch Events
+					if (is_touch_device()) {
 						$(_container).unbind("touchstart", _touchstart);
 						$(_container).unbind("touchmove", _touchmove);
 						$(_container).unbind("touchend", _touchend);
@@ -290,8 +294,7 @@
 					$(document).mouseup(_mouseup);
 
 					// iPhone Events
-					var agent = navigator.userAgent;
-					if (agent.indexOf("iPhone") > 0 || agent.indexOf("iPod") > 0) {
+					if (is_touch_device()) {
 						$(_container).bind("touchstart", _touchstart);
 						$(_container).bind("touchmove", _touchmove);
 						$(_container).bind("touchend", _touchend);
@@ -306,8 +309,7 @@
 				$(document).unbind("mouseup", _mouseup);
 				
 				// iPhone Events
-				var agent = navigator.userAgent;
-				if (agent.indexOf("iPhone") > 0 || agent.indexOf("iPod") > 0) {
+				if (is_touch_device()) {
 					$(_container).unbind("touchstart", _touchstart);
 					$(_container).unbind("touchmove", _touchmove);
 					$(_container).unbind("touchend", _touchend);
