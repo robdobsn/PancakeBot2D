@@ -3,38 +3,55 @@ var PanDisplay,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 PanDisplay = (function() {
-  function PanDisplay(parentSelector, displayRect) {
+  function PanDisplay(parentSelector, panBitmapRect, pancakeSketchRect, buttonsRect, logoRect) {
     this.parentSelector = parentSelector;
     this.sketchChanged = __bind(this.sketchChanged, this);
-    $(this.parentSelector).append("<div id=\"PanDisplay\" style=\"position:absolute;\"><img src=\"img/pan.png\"></img></div>\n<div id=\"pancakePath\" style=\"position:absolute;\"></div>");
+    $(this.parentSelector).append("<div id=\"logobox\" style=\"position:absolute;\">\n	<img src=\"http://robdobson.com/pancakebot/img/panlogo.png\" style=\"width:100%;height:auto\">\n	</img>\n</div>\n<div id=\"PanDisplay\" style=\"position:absolute;z-index:-10\">\n	<img src=\"http://robdobson.com/pancakebot/img/pan.png\">\n	</img>\n</div>\n<div id=\"pancakePath\" style=\"position:absolute;\"></div>");
     this.sketchpad = Raphael.sketchpad("pancakePath", {
-      width: 400,
-      height: 400,
+      width: 100,
+      height: 100,
       editing: true
     });
-    this.sketchpad.setCircularBounds(200, 200, 170);
-    this.sketchpad.pen().color("#d0d0d0");
+    this.sketchpad.pen().color("#ecebd3");
     this.sketchpad.change(this.sketchChanged);
-    this.reposition(displayRect);
+    this.reposition(panBitmapRect, pancakeSketchRect, buttonsRect, logoRect);
     return;
   }
 
-  PanDisplay.prototype.getStrokes = function() {
-    return this.sketchpad.strokes();
+  PanDisplay.prototype.getPath = function() {
+    if (this.sketchpad.strokes().length > 0) {
+      return this.sketchpad.strokes()[0].path;
+    }
+    return null;
   };
 
-  PanDisplay.prototype.reposition = function(displayRect) {
-    var height, panBorder, radius, width;
-    this.displayRect = displayRect;
-    panBorder = 10;
-    height = this.displayRect.height;
-    width = this.displayRect.width;
-    radius = (Math.min(height, width) - panBorder * 2) / 2;
-    $("#PanDisplay").css("left", this.displayRect.x + "px");
-    $("#PanDisplay").css("top", this.displayRect.y + "px");
+  PanDisplay.prototype.setupPathEditor = function() {};
+
+  PanDisplay.prototype.reposition = function(panBitmapRect, pancakeSketchRect, buttonsRect, logoRect) {
+    var circleRadius, height, panBorder, pancakeBorder, width;
+    this.panBitmapRect = panBitmapRect;
+    this.pancakeSketchRect = pancakeSketchRect;
+    this.buttonsRect = buttonsRect;
+    this.logoRect = logoRect;
+    panBorder = this.panBitmapRect.height / 70;
+    height = this.panBitmapRect.height;
+    width = this.panBitmapRect.width;
+    $("#PanDisplay").css("left", this.panBitmapRect.x + "px");
+    $("#PanDisplay").css("top", this.panBitmapRect.y + "px");
     $("#PanDisplay img").height(height);
-    $("#pancakePath").css("left", this.displayRect.x + "px");
-    $("#pancakePath").css("top", this.displayRect.y + "px");
+    $("#PanDisplay img").width(width);
+    $("#pancakePath").css("left", this.pancakeSketchRect.x + "px");
+    $("#pancakePath").css("top", this.pancakeSketchRect.y + "px");
+    this.sketchpad.paper().setSize(this.pancakeSketchRect.width, this.pancakeSketchRect.height);
+    pancakeBorder = this.pancakeSketchRect.height / 12;
+    circleRadius = this.pancakeSketchRect.height / 2 - pancakeBorder;
+    this.sketchpad.setCircularBounds(this.pancakeSketchRect.width / 2, this.pancakeSketchRect.height / 2, circleRadius);
+    $("#logobox").css("left", this.logoRect.x);
+    $("#logobox").css("top", this.logoRect.y);
+    $("#logobox").css("width", this.logoRect.width);
+    $("#logobox").css("height", this.logoRect.height);
+    $("#buttonbox").css("left", this.buttonsRect.x);
+    $("#buttonbox").css("top", this.buttonsRect.y);
   };
 
   PanDisplay.prototype.sketchChanged = function() {

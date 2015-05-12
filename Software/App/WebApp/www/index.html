@@ -9,6 +9,11 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <title>Pancake Bot 2D</title>
         <style>
+/*            html, body, .scrollable {
+                overflow: auto; 
+                -webkit-overflow-scrolling: touch;
+            }*/
+
             * {
                 -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
             }
@@ -29,27 +34,49 @@
                     color-stop(0.51, #E4E4E4)
                 );
                 background-attachment:fixed;
-                font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+                font-family:Helvetica, Arial, sans-serif;
                 font-size:12px;
                 height:100%;
                 margin:0px;
                 padding:0px;
-                text-transform:uppercase;
                 width:100%;
+            }
+
+            .buttonText {
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select:none;
+                user-select:none;
+                -o-user-select:none;
+                unselectable='on'
             }
 
         </style>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script type="text/javascript" src="lib/raphael-min.js"></script>
-        <script type="text/javascript" src="lib/raphael.sketchpad.js"></script>
-        <script type="text/javascript" src="js/pancakeapp.js"></script>
-        <script type="text/javascript" src="js/PanDisplay.js"></script>
+        <script type="text/javascript" src="http://robdobson.com/pancakebot/lib/raphael-min.js"></script>
+        <script type="text/javascript" src="http://robdobson.com/pancakebot/lib/raphael.sketchpad.js"></script>
+        <script type="text/javascript" src="http://robdobson.com/pancakebot/js/pancakeapp.js"></script>
+        <script type="text/javascript" src="http://robdobson.com/pancakebot/js/PanDisplay.js"></script>
     <body>
-        <div id="pancakePath"></div>
-
         <div id="data"></div>
 
-        <button id="printbtn">Print</button>
-
+        <div id="buttonbox" style="position:absolute;left:600px;top:400px;cursor:pointer">
+            <svg height="80" width="215" id="printbtn">
+                <defs>
+                    <linearGradient id="linearGradient3784" x1="0%" y1="0%" x2="80%" y2="80%">
+                      <stop
+                         id="stop3786"
+                         offset="0"
+                         style="stop-color:#7a7a7a;stop-opacity:1;" />
+                      <stop
+                         id="stop3788"
+                         offset="1"
+                         style="stop-color:#000000;stop-opacity:1;" />
+                    </linearGradient>
+                </defs>
+                <rect x="0" y="0" height="80" width="215" rx="15" ry="15" fill="url(#linearGradient3784)"></rect>
+                <text class="buttonText" fill="#ffffff" font-size="45" font-family="Verdana" x="45" y="57" user-select:"none">PRINT</text>
+            </svg>
+        </div>
     </body>
 </html>
