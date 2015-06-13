@@ -23,12 +23,18 @@ class PanDisplay
 		@reposition(panBitmapRect, pancakeSketchRect, buttonsRect, logoRect)
 		return
 
-	getPath: ->
-		if @sketchpad.strokes().length > 0
-			return @sketchpad.strokes()[0].path
-		return null
+	getStrokes: ->
+		strokeJson = @sketchpad.json()
+		strokes = JSON.parse(strokeJson)
+		pathsOnly = (stroke.path for stroke in strokes)
+		return pathsOnly
 
-	setupPathEditor: ->
+	getPanBoundary: ->
+		panBounds =
+			x: @panCentreX
+			y: @panCentreY
+			radius: @panBoundaryRadius
+		return panBounds
 
 	reposition: (@panBitmapRect, @pancakeSketchRect, @buttonsRect, @logoRect) ->
 		# Pan image
@@ -44,10 +50,15 @@ class PanDisplay
 		$("#pancakePath").css("left", @pancakeSketchRect.x + "px") 
 		$("#pancakePath").css("top", @pancakeSketchRect.y + "px")
 		@sketchpad.paper().setSize(@pancakeSketchRect.width, @pancakeSketchRect.height)
+
+		# Set a circular boundary for the pan
 		pancakeBorder = @pancakeSketchRect.height / 12
-		circleRadius = @pancakeSketchRect.height / 2 - pancakeBorder
-		@sketchpad.setCircularBounds(@pancakeSketchRect.width/2, @pancakeSketchRect.height/2, circleRadius)
-		# $(".app h1").text("displayRect " + JSON.stringify(@displayRect))
+		@panBoundaryRadius = @pancakeSketchRect.height / 2 - pancakeBorder
+		@panCentreX = @pancakeSketchRect.width/2
+		@panCentreY = @pancakeSketchRect.height/2
+		@sketchpad.setCircularBounds(@panCentreX, @panCentreY, @panBoundaryRadius)
+
+		# $(".app h1").text("boundsCentre x,y " + @panCentreY + "," + @panCentreY + " radius " + @panBoundaryRadius)
 
 		# Reposition logo
 		$("#logobox").css("left", @logoRect.x)
@@ -61,14 +72,15 @@ class PanDisplay
 		return
 
 	sketchChanged: () =>
-		sss3 = ""
-		for stroke in @sketchpad.strokes()
-			sss = JSON.stringify(stroke)
-			path = stroke.path[0]
-			sss1 = JSON.stringify(path)
-			testpath = "M10 10L900 900"
-			res = Raphael.pathIntersection(stroke.path, testpath)
-			sss2 = JSON.stringify(res)
-			sss3 += sss2 + "\n"
-		$("#debug1").html(sss3)
+		# sss3 = ""
+		# for stroke in @sketchpad.strokes()
+		# 	sss = JSON.stringify(stroke)
+		# 	path = stroke.path[0]
+		# 	sss1 = JSON.stringify(path)
+		# 	testpath = "M10 10L900 900"
+		# 	res = Raphael.pathIntersection(stroke.path, testpath)
+		# 	sss2 = JSON.stringify(res)
+		# 	sss3 += sss2 + "\n"
+
+		# $("#debug1").html("Len=" + @getStrokes().length + " " + JSON.stringify(@getStrokes()))
 		return

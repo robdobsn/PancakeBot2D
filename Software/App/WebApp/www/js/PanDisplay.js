@@ -18,17 +18,34 @@ PanDisplay = (function() {
     return;
   }
 
-  PanDisplay.prototype.getPath = function() {
-    if (this.sketchpad.strokes().length > 0) {
-      return this.sketchpad.strokes()[0].path;
-    }
-    return null;
+  PanDisplay.prototype.getStrokes = function() {
+    var pathsOnly, stroke, strokeJson, strokes;
+    strokeJson = this.sketchpad.json();
+    strokes = JSON.parse(strokeJson);
+    pathsOnly = (function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = strokes.length; _i < _len; _i++) {
+        stroke = strokes[_i];
+        _results.push(stroke.path);
+      }
+      return _results;
+    })();
+    return pathsOnly;
   };
 
-  PanDisplay.prototype.setupPathEditor = function() {};
+  PanDisplay.prototype.getPanBoundary = function() {
+    var panBounds;
+    panBounds = {
+      x: this.panCentreX,
+      y: this.panCentreY,
+      radius: this.panBoundaryRadius
+    };
+    return panBounds;
+  };
 
   PanDisplay.prototype.reposition = function(panBitmapRect, pancakeSketchRect, buttonsRect, logoRect) {
-    var circleRadius, height, panBorder, pancakeBorder, width;
+    var height, panBorder, pancakeBorder, width;
     this.panBitmapRect = panBitmapRect;
     this.pancakeSketchRect = pancakeSketchRect;
     this.buttonsRect = buttonsRect;
@@ -44,8 +61,10 @@ PanDisplay = (function() {
     $("#pancakePath").css("top", this.pancakeSketchRect.y + "px");
     this.sketchpad.paper().setSize(this.pancakeSketchRect.width, this.pancakeSketchRect.height);
     pancakeBorder = this.pancakeSketchRect.height / 12;
-    circleRadius = this.pancakeSketchRect.height / 2 - pancakeBorder;
-    this.sketchpad.setCircularBounds(this.pancakeSketchRect.width / 2, this.pancakeSketchRect.height / 2, circleRadius);
+    this.panBoundaryRadius = this.pancakeSketchRect.height / 2 - pancakeBorder;
+    this.panCentreX = this.pancakeSketchRect.width / 2;
+    this.panCentreY = this.pancakeSketchRect.height / 2;
+    this.sketchpad.setCircularBounds(this.panCentreX, this.panCentreY, this.panBoundaryRadius);
     $("#logobox").css("left", this.logoRect.x);
     $("#logobox").css("top", this.logoRect.y);
     $("#logobox").css("width", this.logoRect.width);
@@ -54,22 +73,7 @@ PanDisplay = (function() {
     $("#buttonbox").css("top", this.buttonsRect.y);
   };
 
-  PanDisplay.prototype.sketchChanged = function() {
-    var path, res, sss, sss1, sss2, sss3, stroke, testpath, _i, _len, _ref;
-    sss3 = "";
-    _ref = this.sketchpad.strokes();
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      stroke = _ref[_i];
-      sss = JSON.stringify(stroke);
-      path = stroke.path[0];
-      sss1 = JSON.stringify(path);
-      testpath = "M10 10L900 900";
-      res = Raphael.pathIntersection(stroke.path, testpath);
-      sss2 = JSON.stringify(res);
-      sss3 += sss2 + "\n";
-    }
-    $("#debug1").html(sss3);
-  };
+  PanDisplay.prototype.sketchChanged = function() {};
 
   return PanDisplay;
 

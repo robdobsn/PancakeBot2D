@@ -7,6 +7,7 @@ $(document).ready ->
 		evt.stopPropagation()
 	# Go
 	pancakeApp.go()
+	return
 
 class PancakeApp
 	constructor: ->
@@ -26,11 +27,9 @@ class PancakeApp
 		# Handler for orientation change
 		$(window).on 'orientationchange', =>
 		  @redisplay()
-
 		# And resize event
 		$(window).on 'resize', =>
 		  @redisplay()
-
 		return
 
 	calcLayout: ->
@@ -115,8 +114,9 @@ class PancakeApp
 			width: buttonsBoxWidth
 			height: buttonsBoxHeight
 		
-		$(".app h1").text("winWid " + winWidth + " winHeight " + winHeight + " panSize " + JSON.stringify(@panSize) + "displayRect " + JSON.stringify(@panDisplayRect))
-
+		# $(".app h1").text("winWid " + winWidth + " winHeight " + winHeight + " panSize " + JSON.stringify(@panSize) + "displayRect " + JSON.stringify(@panDisplayRect))
+		return
+		
 	go: ->
 
 		# Create the pan display
@@ -125,31 +125,50 @@ class PancakeApp
 
 		# Print
 		$('#printbtn').on "click", =>
-			pancakePath = @panDisplay.getPath()
-			if pancakePath?
-				$.ajax
-					type: "POST"
-					url: "print"
-					contentType : 'application/json'
-					data: JSON.stringify(pancakePath)
-					success: ->
-						console.log("Success")
-					dataType: "json"
-
-		# Create the path editor
-		# @sketchpad = Raphael.sketchpad("editor", { width: 400, height: 400, editing: true })
-		# @sketchpad.setCircularBounds()
-
-		# When the sketchpad changes, update the input field.
-			# sketchpad.change(function() {
-			#     $("#data").html(sketchpad.json());
-			# });
-	
-		# @sketchpad.change () =>
-		# 	$("#debug1").html("Here")
+			pancakeData =
+				panBounds: @panDisplay.getPanBoundary()
+				strokes: @panDisplay.getStrokes()
+			# Convert to JSON
+			pancakeDataJson = JSON.stringify(pancakeData)
+			# Send to pancakebot
+			@sendChunkToBot(pancakeDataJson, true)
+			return
 
 		return
 
 	redisplay: ->
 		@calcLayout()
 		@panDisplay.reposition(@panBitmapRect, @pancakeSketchRect, @buttonsRect, @logoRect)
+		return
+
+	sendChunkToBot: (strokeRemainder, firstChunk) =>
+		# Send in several pieces if required
+		MAX_CONTENT_POST_MSG = 500
+		if firstChunk
+			if strokeRemainder.length <= MAX_CONTENT_POST_MSG
+				urlToUse = "printinitgo"
+			else
+				urlToUse = "printinit"
+		else
+			if strokeRemainder.length > MAX_CONTENT_POST_MSG
+				urlToUse = "printpart" 
+			else 
+				urlToUse = "printgo"
+		if strokeRemainder.length is 0
+			@postStrokesCompleted()
+		else
+			console.log("Sending " + urlToUse + " " + strokeRemainder.slice(0,MAX_CONTENT_POST_MSG).length)
+			$.ajax
+				type: "POST"
+				url: urlToUse
+				contentType : 'text/plain'
+				data: strokeRemainder.slice(0,MAX_CONTENT_POST_MSG)
+				success: =>
+					remainder = strokeRemainder.slice(MAX_CONTENT_POST_MSG)
+					@sendChunkToBot(remainder, false)
+					return
+		return
+
+	postStrokesCompleted: ->
+		console.log("completed POST")
+		return

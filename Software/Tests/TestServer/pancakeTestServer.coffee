@@ -1,12 +1,11 @@
 http = require("http")
 Express = require("express")
-request = require('request')
 moment = require('moment')
 path = require('path')
 bodyParser = require('body-parser')
 
 # Use bodyParser to parse application/json
-jsonParser = bodyParser.json()
+textParser = bodyParser.text()
 
 app = Express()
 app.set "port", process.env.PORT or 5294 # Arbitrarily chosen port number
@@ -20,11 +19,32 @@ app.set "view engine", "jade"
 #     rollupperiod = req.params.rollupperiod
 #   if series? and rollupperiod?
 
-lastPath = []
+strokesToPrint = ""
 
-app.post "/print", jsonParser, (req, res) ->
-  console.log(JSON.stringify(req.body))
-  lastPath = req.body
+app.post "/printinit", textParser, (req, res) ->
+  strokesToPrint = req.body
+  res.send("OK")
+  return
+
+app.post "/printpart", textParser, (req, res) ->
+  strokesToPrint += req.body
+  res.send("OK")
+  return
+
+app.post "/printgo", textParser, (req, res) ->
+  strokesToPrint += req.body
+  console.log(strokesToPrint)
+  strokes = JSON.parse(strokesToPrint)
+  console.log("Num strokes " + strokes.length)
+  res.send("OK")
+  return
+
+app.post "/printinitgo", textParser, (req, res) ->
+  strokesToPrint = req.body
+  console.log(strokesToPrint)
+  strokes = JSON.parse(strokesToPrint)
+  console.log("Num strokes " + strokes.length)
+  res.send("OK")
   return
 
 app.get "/path", (req, res) ->

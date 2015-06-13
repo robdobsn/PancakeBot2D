@@ -55,8 +55,18 @@
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script type="text/javascript" src="http://robdobson.com/pancakebot/lib/raphael-min.js"></script>
         <script type="text/javascript" src="http://robdobson.com/pancakebot/lib/raphael.sketchpad.js"></script>
-        <script type="text/javascript" src="http://robdobson.com/pancakebot/js/pancakeapp.js"></script>
-        <script type="text/javascript" src="http://robdobson.com/pancakebot/js/PanDisplay.js"></script>
+        <script type="text/javascript" src="js/pancakeapp.js"></script>
+        <script>
+            if (typeof PancakeApp == 'undefined') {
+                document.write(unescape("%3Cscript src='//robdobson.com/pancakebot/js/pancakeapp.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+        <script type="text/javascript" src="js/PanDisplay.js"></script>
+        <script>
+            if (typeof PanDisplay == 'undefined') {
+                document.write(unescape("%3Cscript src='//robdobson.com/pancakebot/js/PanDisplay.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
     <body>
         <div id="data"></div>
 
