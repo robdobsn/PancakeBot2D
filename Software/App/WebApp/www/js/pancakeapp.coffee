@@ -11,16 +11,13 @@ $(document).ready ->
 
 class PancakeApp
 	constructor: ->
-		# Size of pan bitmap
+		# Size of pan bitmap - in landscape mode (portrait is just swapped)
 		@panSize = 
-			width: 400
-			height: 319
+			width: 838
+			height: 667
 		# Basic body for DOM
 		$("body").prepend """
 			<div id="sqWrapper">
-				<div class="app">
-					<h1 style="color:blue">Pancake Bot 2D</h1>
-				</div>
 			</div>
 			<div id="debug1"></div>
 			"""
@@ -33,29 +30,35 @@ class PancakeApp
 		return
 
 	calcLayout: ->
+
 		# Compute window layout
 		panMarginX = 20
 		panMarginY = 30
 		winWidth = window.innerWidth
 		winHeight = window.innerHeight
-		# winWidth = $(window).width()
-		# winHeight = $(window).height()
-		isPortrait = (winWidth < winHeight)
-		if isPortrait
+
+		# Backdrop bitmap
+		@backdropBitmapRect = 
+			x:0
+			y:0
+			width: winWidth
+			height: winHeight
+
+		@isPortrait = (winWidth < winHeight)
+		if @isPortrait
+			@panWidth = winWidth - 2 * panMarginX
+			@panHeight = @panWidth * @panSize.width / @panSize.height
+			if @panHeight > winHeight - 2 * panMarginY
+				@panHeight = winHeight - 2 * panMarginY
+				@panWidth = @panHeight * @panSize.height / @panSize.width
+		else
 			@panWidth = winWidth - 2 * panMarginX
 			@panHeight = @panWidth * @panSize.height / @panSize.width
-			@panX = panMarginX
-			@panY = winHeight - @panHeight - panMarginY
-		else if winWidth/winHeight < 1.3
-			@panWidth = winWidth * 0.83
-			@panHeight = @panWidth * @panSize.height / @panSize.width
-			@panX = panMarginX
-			@panY = panMarginY
-		else
-			@panHeight = winHeight - 2 * panMarginY
-			@panWidth = @panHeight * @panSize.width / @panSize.height
-			@panX = panMarginX
-			@panY = panMarginY
+			if @panHeight > winHeight - 2 * panMarginY
+				@panHeight = winHeight - 2 * panMarginY
+				@panWidth = @panHeight * @panSize.width / @panSize.height
+		@panX = panMarginX
+		@panY = panMarginY
 
 		# Pan bitmap
 		@panBitmapRect = 
@@ -63,56 +66,36 @@ class PancakeApp
 			y:@panY
 			width:@panWidth
 			height:@panHeight
+			portrait:@isPortrait
+
 		# Note the following is intentionally using height instead of width as the bitmap
 		# of the pan has the handle extending the width but the height is the diameter of the pan
 		@pancakeSketchRect = 
 			x:@panX
 			y:@panY
-			width:@panHeight
-			height:@panHeight
-
-		# Logo positioning
-		if !isPortrait
-			logoMarginY = 150
-			logoBoxX = @panX + @panWidth * 0.83
-			logoBoxY = @panY + logoMarginY
-			logoBoxWidth = 214
-			logoBoxHeight = logoBoxWidth
-		else
-			logoOnBottomRight = false
-			if logoOnBottomRight
-				logoBoxWidth = @panWidth * 0.2
-				logoBoxHeight = logoBoxWidth
-				logoBoxX = winWidth * 0.8 - 20
-				logoBoxY = @panY + @panHeight - logoBoxWidth - 20
-			else
-				logoBoxWidth = 214
-				logoBoxHeight = logoBoxWidth
-				logoBoxX = panMarginX
-				logoBoxY = panMarginY
-		@logoRect =
-			x: logoBoxX
-			y: logoBoxY
-			width: logoBoxWidth
-			height: logoBoxHeight
+			width: if @isPortrait then @panWidth else @panHeight
+			height: if @isPortrait then @panWidth else @panHeight
 
 		# Buttons
-		if !isPortrait
-			buttonsMarginY = 450
+		if @isPortrait
+			buttonsBoxX = panMarginX + @panWidth / 4
+			buttonsBoxY = panMarginY * 3 + @panWidth
+			buttonsBoxWidth = 250
+			buttonsBoxHeight = winHeight - @panY
+			isVertical = false
+		else
+			buttonsMarginY = panMarginY + @panHeight / 5
 			buttonsBoxX = @panX + @panWidth * 0.83
 			buttonsBoxY = @panY + buttonsMarginY
 			buttonsBoxWidth = winWidth - buttonsBoxX
 			buttonsBoxHeight = winHeight - buttonsBoxY
-		else
-			buttonsBoxX = winWidth * 0.5
-			buttonsBoxY = panMarginY
-			buttonsBoxWidth = 250
-			buttonsBoxHeight = winHeight - @panY
+			isVertical = true
 		@buttonsRect =
 			x: buttonsBoxX
 			y: buttonsBoxY
 			width: buttonsBoxWidth
 			height: buttonsBoxHeight
+			vertical: isVertical
 		
 		# $(".app h1").text("winWid " + winWidth + " winHeight " + winHeight + " panSize " + JSON.stringify(@panSize) + "displayRect " + JSON.stringify(@panDisplayRect))
 		return
@@ -121,7 +104,7 @@ class PancakeApp
 
 		# Create the pan display
 		@calcLayout()
-		@panDisplay = new PanDisplay("#sqWrapper", @panBitmapRect, @pancakeSketchRect, @buttonsRect, @logoRect)
+		@panDisplay = new PanDisplay("#sqWrapper", "http://robdobson.com/pancakebot/", @backdropBitmapRect, @panBitmapRect, @pancakeSketchRect, @buttonsRect)
 
 		# Print
 		$('#printbtn').on "click", =>
@@ -138,7 +121,7 @@ class PancakeApp
 
 	redisplay: ->
 		@calcLayout()
-		@panDisplay.reposition(@panBitmapRect, @pancakeSketchRect, @buttonsRect, @logoRect)
+		@panDisplay.reposition(@backdropBitmapRect, @panBitmapRect, @pancakeSketchRect, @buttonsRect)
 		return
 
 	sendChunkToBot: (strokeRemainder, firstChunk) =>

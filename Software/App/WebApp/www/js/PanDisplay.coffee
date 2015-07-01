@@ -1,13 +1,16 @@
 class PanDisplay
-	constructor: (@parentSelector, panBitmapRect, pancakeSketchRect, buttonsRect, logoRect) ->
+	constructor: (@parentSelector, @imgPath, backdropRect, panBitmapRect, pancakeSketchRect, buttonsRect) ->
 		# Add to DOM
 		$(@parentSelector).append """
-			<div id="logobox" style="position:absolute;">
-				<img src="http://robdobson.com/pancakebot/img/panlogo.png" style="width:100%;height:auto">
+			<div id="backdrop" style="position:absolute;z-index:-20">
+				<img src="img/backdrop.png" style="">
 				</img>
 			</div>
+	        <div id="buttonbox" style="position:absolute;cursor:pointer">
+	        	<img id="printbtn" src="img/print.png"></img>
+	        </div>
 			<div id="PanDisplay" style="position:absolute;z-index:-10">
-				<img src="http://robdobson.com/pancakebot/img/pan.png">
+				<img src="img/panLandscape.png">
 				</img>
 			</div>
 			<div id="pancakePath" style="position:absolute;"></div>
@@ -20,7 +23,7 @@ class PanDisplay
 		@sketchpad.pen().color("#ecebd3")
 		@sketchpad.change(@sketchChanged)
 		# Reposition display eleemnts
-		@reposition(panBitmapRect, pancakeSketchRect, buttonsRect, logoRect)
+		@reposition(backdropRect, panBitmapRect, pancakeSketchRect, buttonsRect)
 		return
 
 	getStrokes: ->
@@ -36,7 +39,14 @@ class PanDisplay
 			radius: @panBoundaryRadius
 		return panBounds
 
-	reposition: (@panBitmapRect, @pancakeSketchRect, @buttonsRect, @logoRect) ->
+	reposition: (@backdropRect, @panBitmapRect, @pancakeSketchRect, @buttonsRect) ->
+
+		# Backdrop
+		$("#backdrop").css("left", @backdropRect.x + "px") 
+		$("#backdrop").css("top", @backdropRect.y + "px")
+		$("#backdrop img").height(@backdropRect.height)
+		$("#backdrop img").width(@backdropRect.width)		
+
 		# Pan image
 		panBorder = @panBitmapRect.height/70
 		height = @panBitmapRect.height
@@ -45,6 +55,10 @@ class PanDisplay
 		$("#PanDisplay").css("top", @panBitmapRect.y + "px")
 		$("#PanDisplay img").height(height)
 		$("#PanDisplay img").width(width)
+		if @panBitmapRect.portrait
+			$("#PanDisplay img").attr("src","img/panPortrait.png")
+		else
+			$("#PanDisplay img").attr("src","img/panLandscape.png")
 
 		# Reposition sketchpad
 		$("#pancakePath").css("left", @pancakeSketchRect.x + "px") 
@@ -59,12 +73,6 @@ class PanDisplay
 		@sketchpad.setCircularBounds(@panCentreX, @panCentreY, @panBoundaryRadius)
 
 		# $(".app h1").text("boundsCentre x,y " + @panCentreY + "," + @panCentreY + " radius " + @panBoundaryRadius)
-
-		# Reposition logo
-		$("#logobox").css("left", @logoRect.x)
-		$("#logobox").css("top", @logoRect.y)
-		$("#logobox").css("width", @logoRect.width)
-		$("#logobox").css("height", @logoRect.height)
 
 		# Reposition buttons
 		$("#buttonbox").css("left", @buttonsRect.x)
